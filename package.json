@@ -17,7 +17,7 @@
     "jest": "^25.1.0",
     "jest-junit": "^10.0.0",
     "pino-pretty": "^3.5.0",
-    "ts-jest": "^25.1.0",
+    "ts-jest": "^25.2.0",
     "tsc-watch": "^4.1.0",
     "typescript": "^3.7.5"
   }
