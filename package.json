@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "dotenv": "^8.2.0",
-    "fastify": "^2.12.0"
+    "fastify": "^2.12.1"
   },
   "devDependencies": {
     "@types/eslint": "6.1.7",
