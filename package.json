@@ -24,7 +24,7 @@
     "eslint-plugin-jest": "^23.7.0",
     "jest": "^25.1.0",
     "jest-junit": "^10.0.0",
-    "pino-pretty": "^3.5.0",
+    "pino-pretty": "^3.6.1",
     "prettier": "^1.19.1",
     "ts-jest": "^25.2.0",
     "tsc-watch": "^4.1.0",
