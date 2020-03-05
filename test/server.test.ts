@@ -16,14 +16,13 @@ describe('server initialisation', () => {
     expect(server.server.listening).toBe(true);
   });
 
-  it('has a "url" decorator', () => {
-    expect(server.url).toContain('http://127.0.0.1:');
-  });
-
   it('has access to the server config via the "config" decorator', () => {
     // Doesn't need to be an exhaustive check; just assert that we seem to be
     // able to access the server config
-    expect(server.config).toMatchObject({});
+    expect(server.config).toMatchObject({
+      host: expect.any(String),
+      logger: expect.any(Object),
+    });
   });
 
   it('shuts down gracefully', async () => {
