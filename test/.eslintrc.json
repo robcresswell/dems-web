@@ -1,8 +1,7 @@
 {
   "extends": ["../.eslintrc", "plugin:jest/recommended"],
   "parserOptions": {
-    "project": "./test/tsconfig.json",
-    "extraFileExtensions": [".ts"]
+    "project": "./test/tsconfig.json"
   },
   "plugins": ["jest"]
 }

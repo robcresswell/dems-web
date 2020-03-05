@@ -1,5 +1,5 @@
 import { resolve } from 'path';
-import { readFileSync } from 'fs';
+import { promises as fsp } from 'fs';
 import { Config } from './types';
 import { initServer } from './server';
 import * as dotenv from 'dotenv';
@@ -9,12 +9,12 @@ import * as dotenv from 'dotenv';
  * a single IIAFE makes testing much easier, as any tests can manually control
  * the DB and server, as well as their configs.
  */
-(async function() {
+(async () => {
   let config: Readonly<Config>;
 
   try {
     const configFile = resolve(__dirname, '..', 'config.json');
-    const configJSON = readFileSync(configFile, { encoding: 'utf8' });
+    const configJSON = await fsp.readFile(configFile, { encoding: 'utf8' });
     config = Object.freeze(JSON.parse(configJSON));
   } catch (error) {
     // If we're in dev mode, silently fall back to some minimal defaults to

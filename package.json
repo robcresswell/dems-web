@@ -2,10 +2,12 @@
   "name": "{{ name }}",
   "main": "dist/main.js",
   "private": true,
+  "type": "commonjs",
   "scripts": {
-    "dev": "tsc-watch --onSuccess 'node dist/main.js'",
+    "dev": "NODE_ENV=development tsc-watch --onSuccess 'node --unhandled-rejections=strict dist/main.js'",
     "lint": "prettier --check '{src,test}/**/*.ts' && eslint '{src,test}/**/*.ts'",
     "format": "prettier --write {src,test}/**/*.ts",
+    "start": "NODE_ENV=production node --unhandled-rejections=strict dist/main.js",
     "test": "jest --ci"
   },
   "dependencies": {
