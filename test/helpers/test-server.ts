@@ -9,10 +9,16 @@ import { getTestConfig } from './test-config';
  * @param config
  * A configuration object. Defaults to the config in `helpers/test-config`.
  */
-export async function startTestServer(config: Config = getTestConfig()) {
-  const server = await initServer(config);
+export async function startTestServer(config?: Config) {
+  let serverConfig = config;
 
-  await server.listen(config.port);
+  if (typeof serverConfig === 'undefined') {
+    serverConfig = await getTestConfig();
+  }
+
+  const server = await initServer(serverConfig);
+
+  await server.listen(serverConfig.port);
 
   return server;
 }
