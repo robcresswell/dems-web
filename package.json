@@ -1,5 +1,5 @@
 {
-  "name": "template",
+  "name": "{{ name }}",
   "main": "dist/main.js",
   "private": true,
   "scripts": {
