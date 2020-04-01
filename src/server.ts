@@ -23,29 +23,27 @@ export async function initServer(config: Readonly<Config>) {
   // test servers
   fastify.decorate('config', config);
 
-  if (process.env.NODE_ENV === 'development') {
-    // Read some content from the package.json so we don't need to duplicate it
-    const packageJSONString = await fsp.readFile(
-      path.join(__dirname, '..', 'package.json'),
-      'utf-8',
-    );
-    const packageJSON = JSON.parse(packageJSONString);
-    const { name, description, version } = packageJSON;
+  // Read some content from the package.json so we don't need to duplicate it
+  const packageJSONString = await fsp.readFile(
+    path.join(__dirname, '..', 'package.json'),
+    'utf-8',
+  );
+  const packageJSON = JSON.parse(packageJSONString);
+  const { name, description, version } = packageJSON;
 
-    // Register the fastify-swagger plugin, which generates documentation from
-    // our JSON schema route validation
-    // Docs served at /documentation
-    fastify.register(fastifySwagger, {
-      exposeRoute: true,
-      swagger: {
-        info: {
-          title: name,
-          description,
-          version,
-        },
+  // Register the fastify-swagger plugin, which generates documentation from
+  // our JSON schema route validation
+  // Docs served at /documentation
+  fastify.register(fastifySwagger, {
+    exposeRoute: true,
+    swagger: {
+      info: {
+        title: name,
+        description,
+        version,
       },
-    });
-  }
+    },
+  });
 
   // Register all defined routes
   routes.forEach((route) => {

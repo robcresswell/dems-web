@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import * as dotenv from 'dotenv';
 import { promises as fsp } from 'fs';
 import { resolve } from 'path';
