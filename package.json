@@ -1,20 +1,21 @@
 {
-  "name": "{{ name }}",
+  "name": "{{ name }} ",
   "main": "dist/main.js",
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "dev": "NODE_ENV=development tsc-watch --onSuccess 'node --unhandled-rejections=strict .'",
+    "dev": "NODE_ENV=development tsc-watch --onSuccess 'node -r source-map-support/register --unhandled-rejections=strict .'",
     "lint": "prettier --check '{src,test}/**/*.ts' && eslint '{src,test}/**/*.ts'",
     "lint:fix": "prettier --write {src,test}/**/*.ts && eslint --fix '{src,test}/**/*.ts'",
-    "start": "NODE_ENV=production node --unhandled-rejections=strict .",
+    "start": "NODE_ENV=production node -r source-map-support/register --unhandled-rejections=strict .",
     "test": "jest --ci",
     "test:coverage": "jest --ci --coverage"
   },
   "dependencies": {
     "dotenv": "^8.2.0",
     "fastify": "^2.13.0",
-    "fastify-swagger": "^2.5.0"
+    "fastify-swagger": "^2.5.0",
+    "source-map-support": "^0.5.16"
   },
   "devDependencies": {
     "@types/eslint": "6.1.9",
