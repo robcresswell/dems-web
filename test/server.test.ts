@@ -5,7 +5,7 @@ describe('server initialisation', () => {
   let server: FastifyInstance;
 
   beforeEach(async () => {
-    server = await startTestServer();
+    ({ server } = await startTestServer());
   });
 
   afterEach(async () => {

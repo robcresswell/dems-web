@@ -1,7 +1,6 @@
 import { Config } from '../../src/types';
 import { initServer } from '../../src/server';
 import { getTestConfig } from './test-config';
-import * as getPort from 'get-port';
 
 /**
  * A helper to start a server and listen on a given port. Can be passed
@@ -10,11 +9,12 @@ import * as getPort from 'get-port';
  * @param config
  * A configuration object. Defaults to the config in `helpers/test-config`.
  */
-export async function startTestServer(config: Config = getTestConfig()) {
-  const server = await initServer(config);
+export async function startTestServer(config?: Config) {
+  const testConfig = config ?? (await getTestConfig());
 
-  const port = await getPort();
-  await server.listen(port);
+  const server = await initServer(testConfig);
 
-  return server;
+  const host = await server.listen(testConfig.port);
+
+  return { host, server };
 }

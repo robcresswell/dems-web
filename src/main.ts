@@ -1,8 +1,8 @@
-import { resolve } from 'path';
-import { promises as fsp } from 'fs';
-import { Config } from './types';
-import { initServer } from './server';
 import * as dotenv from 'dotenv';
+import { promises as fsp } from 'fs';
+import { resolve } from 'path';
+import { initServer } from './server';
+import { Config } from './types';
 
 /**
  * Triggers all side effects as part of the init process. Isolating this to
