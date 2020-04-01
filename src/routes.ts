@@ -1,5 +1,5 @@
 import { RouteOptions } from 'fastify';
-import { healthcheck, healthcheckSchema } from './controllers/healthcheck';
+import { healthcheck, healthcheckSchema } from './handlers/healthcheck';
 
 export const routes: RouteOptions[] = [
   {

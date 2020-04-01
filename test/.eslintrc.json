@@ -3,5 +3,18 @@
   "parserOptions": {
     "project": "./test/tsconfig.json"
   },
-  "plugins": ["jest"]
+  "plugins": ["jest"],
+  "rules": {
+    "jest/consistent-test-it": "error", // Enforcing 'it' encourages thought about what the test is asserting
+    "jest/expect-expect": "error",
+    "jest/no-export": "error",
+    "jest/no-mocks-import": "error",
+    "jest/no-test-return-statement": "error",
+    "jest/no-try-expect": "error",
+    "jest/require-top-level-describe": "error",
+    "jest/no-commented-out-tests": "error",
+    "jest/no-jasmine-globals": "error",
+    "jest/prefer-todo": "error",
+    "jest/no-if": "error" // Write two tests, not conditional tests
+  }
 }
