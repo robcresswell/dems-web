@@ -1,7 +1,17 @@
-import { Config } from '../../src/types';
 import * as getPort from 'get-port';
+import { Config } from '../../src/types';
+
 /**
- * Returns a frozen configuration object
+ * Returns a configuration object. This is the default used in
+ * `startTestServer()` if no config is passed
+ *
+ * @example
+ * const defaultConfig = await getTestConfig();
+ * const myTestConfig = {
+ *   ...defaultConfig,
+ *   myOverrideKey: 'foo',
+ * };
+ * const { server } = await startTestServer(myTestConfig);
  */
 export async function getTestConfig(): Promise<Config> {
   const port = await getPort();

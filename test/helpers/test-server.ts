@@ -1,5 +1,5 @@
-import { Config } from '../../src/types';
 import { initServer } from '../../src/server';
+import { Config } from '../../src/types';
 import { getTestConfig } from './test-config';
 
 /**
