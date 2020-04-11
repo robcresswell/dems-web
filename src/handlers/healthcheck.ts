@@ -9,7 +9,7 @@ export const healthcheckSchema: RouteSchema = {
   },
 };
 
+// eslint-disable-next-line @typescript-eslint/require-await
 export const healthcheck: RequestHandler = async function (_req, reply) {
   return reply.code(204).send();
 };
-

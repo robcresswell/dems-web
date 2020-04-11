@@ -1,6 +1,6 @@
 import * as Fastify from 'fastify';
 import * as fastifySwagger from 'fastify-swagger';
-import { promises as fsp } from 'fs';
+import { readFileSync } from 'fs';
 import * as path from 'path';
 import { routes } from './routes';
 import { Config } from './types';
@@ -12,7 +12,7 @@ declare module 'fastify' {
   }
 }
 
-export async function initServer(config: Readonly<Config>) {
+export function initServer(config: Readonly<Config>) {
   const { logger } = config;
 
   // Grab framework instance, using the injected config
@@ -24,7 +24,7 @@ export async function initServer(config: Readonly<Config>) {
   fastify.decorate('config', config);
 
   // Read some content from the package.json so we don't need to duplicate it
-  const packageJSONString = await fsp.readFile(
+  const packageJSONString = readFileSync(
     path.join(__dirname, '..', 'package.json'),
     'utf-8',
   );

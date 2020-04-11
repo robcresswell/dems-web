@@ -1,4 +1,3 @@
-import * as getPort from 'get-port';
 import { Config } from '../../src/types';
 
 /**
@@ -6,19 +5,16 @@ import { Config } from '../../src/types';
  * `startTestServer()` if no config is passed
  *
  * @example
- * const defaultConfig = await getTestConfig();
+ * const defaultConfig = getTestConfig();
  * const myTestConfig = {
  *   ...defaultConfig,
  *   myOverrideKey: 'foo',
  * };
  * const { server } = await startTestServer(myTestConfig);
  */
-export async function getTestConfig(): Promise<Config> {
-  const port = await getPort();
-
+export function getTestConfig(): Config {
   return Object.freeze({
     host: 'http://127.0.0.1',
-    port,
     logger: {
       level: 'warn',
       base: null,

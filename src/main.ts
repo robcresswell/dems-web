@@ -5,12 +5,7 @@ import { resolve } from 'path';
 import { initServer } from './server';
 import { Config } from './types';
 
-/**
- * Triggers all side effects as part of the init process. Isolating this to
- * a single IIAFE makes testing much easier, as any tests can manually control
- * the DB and server, as well as their configs.
- */
-(async () => {
+async function main() {
   let config: Readonly<Config>;
 
   try {
@@ -23,7 +18,6 @@ import { Config } from './types';
     if (process.env.NODE_ENV === 'development') {
       config = {
         host: 'http://localhost',
-        port: 3000,
         logger: {
           level: 'debug',
           base: null,
@@ -37,7 +31,7 @@ import { Config } from './types';
     }
   }
 
-  const server = await initServer(config);
+  const server = initServer(config);
 
   // Mutates `process.env` with values in local `.env` file. This means we can
   // avoid storing secrets in global environment variables, and instead keep
@@ -45,9 +39,12 @@ import { Config } from './types';
   dotenv.config();
 
   try {
-    await server.listen(config.port ?? 3000);
+    await server.listen(3000);
   } catch (error) {
     server.log.error(error);
     process.exit(1);
   }
-})();
+}
+
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
+main();

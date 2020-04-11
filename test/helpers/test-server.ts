@@ -1,3 +1,4 @@
+import * as getPort from 'get-port';
 import { initServer } from '../../src/server';
 import { Config } from '../../src/types';
 import { getTestConfig } from './test-config';
@@ -9,12 +10,11 @@ import { getTestConfig } from './test-config';
  * @param config
  * A configuration object. Defaults to the config in `helpers/test-config`.
  */
-export async function startTestServer(config?: Config) {
-  const testConfig = config ?? (await getTestConfig());
+export async function startTestServer(config: Config = getTestConfig()) {
+  const server = initServer(config);
+  const port = await getPort();
 
-  const server = await initServer(testConfig);
-
-  const host = await server.listen(testConfig.port);
+  const host = await server.listen(port);
 
   return { host, server };
 }

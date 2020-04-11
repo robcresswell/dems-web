@@ -4,12 +4,12 @@
     "project": "./tsconfig.json",
     "extraFileExtensions": [".ts"]
   },
-  "plugins": ["jest", "@typescript-eslint"],
+  "plugins": ["@typescript-eslint"],
   "extends": [
     "eslint:recommended",
-    "plugin:jest/recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "prettier",
     "prettier/@typescript-eslint"
   ],
@@ -19,9 +19,9 @@
     "@typescript-eslint/await-thenable": "error",
     "@typescript-eslint/ban-ts-ignore": "error",
     "@typescript-eslint/no-require-imports": "error",
-    "@typescript-eslint/no-unused-vars": "off", // TSC picks this up for us
     "@typescript-eslint/no-unnecessary-type-assertion": "error",
     "@typescript-eslint/promise-function-async": "error",
-    "@typescript-eslint/unbound-method": "error"
+    "@typescript-eslint/unbound-method": "error",
+    "@typescript-eslint/no-floating-promises": "error"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "{{ name }}",
+  "name": "name",
   "main": "dist/main.js",
   "private": true,
   "type": "commonjs",
@@ -14,7 +14,7 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "fastify": "^2.13.0",
-    "fastify-swagger": "^2.5.0",
+    "fastify-swagger": "^2.5.1",
     "got": "^10.7.0",
     "source-map-support": "^0.5.16"
   },
@@ -28,11 +28,11 @@
     "eslint-config-prettier": "^6.10.1",
     "eslint-plugin-jest": "^23.8.2",
     "get-port": "^5.1.1",
-    "jest": "^25.2.4",
+    "jest": "^25.3.0",
     "jest-junit": "^10.0.0",
-    "pino-pretty": "^3.6.1",
-    "prettier": "^2.0.2",
-    "ts-jest": "^25.3.0",
+    "pino-pretty": "^4.0.0",
+    "prettier": "^2.0.4",
+    "ts-jest": "^25.3.1",
     "tsc-watch": "^4.2.3",
     "typescript": "^3.8.3"
   }

@@ -12,7 +12,7 @@ describe('server initialisation', () => {
     await server.close();
   });
 
-  it('can be started', async () => {
+  it('can be started', () => {
     expect(server.server.listening).toBe(true);
   });
 
