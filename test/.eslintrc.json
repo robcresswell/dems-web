@@ -15,6 +15,7 @@
     "jest/no-commented-out-tests": "error",
     "jest/no-jasmine-globals": "error",
     "jest/prefer-todo": "error",
-    "jest/no-if": "error" // Write two tests, not conditional tests
+    "jest/no-if": "error", // Write two tests, not conditional tests
+    "@typescript-eslint/no-unsafe-assignment": "off" // Causes issues with jest expect.any
   }
 }

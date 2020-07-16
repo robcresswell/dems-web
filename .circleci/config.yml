@@ -1,0 +1,44 @@
+version: 2.1
+
+defaults: &defaults
+  docker:
+    - image: node:12-buster
+  working_directory: ~/{{ name }}
+
+jobs:
+  lint:
+    <<: *defaults
+    steps:
+      - checkout
+      - run: npm ci
+      - run: npm run lint
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - run: npm ci
+      - run: npm run test -- --runInBand --coverage
+      - store_test_results:
+          path: reports/jest/
+      - store_artifacts:
+          path: reports/
+  check_generated_types:
+    <<: *defaults
+    steps:
+      - checkout
+      - run: npm ci
+      - run: npm run test:generated-types
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - lint:
+          name: Lint
+          context: nodejs-install
+      - test:
+          name: Test
+          context: nodejs-install
+      - check_generated_types:
+          name: Check Generated Types
+          context: nodejs-install

@@ -1,5 +1,5 @@
-import { startTestServer } from './helpers/test-server';
 import { FastifyInstance } from 'fastify';
+import { startTestServer } from './helpers/test-server';
 
 describe('server initialisation', () => {
   let server: FastifyInstance;
@@ -20,8 +20,8 @@ describe('server initialisation', () => {
     // Doesn't need to be an exhaustive check; just assert that we seem to be
     // able to access the server config
     expect(server.config).toMatchObject({
-      host: expect.any(String),
-      logger: expect.any(Object),
+      HOST: expect.any(String),
+      LOG_LEVEL: expect.any(String),
     });
   });
 

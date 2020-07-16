@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "required": ["HOST", "LOG_LEVEL"],
+  "additionalProperties": false,
+  "properties": {
+    "HOST": {
+      "type": "string"
+    },
+    "LOG_LEVEL": {
+      "type": "string",
+      "enum": ["debug", "info", "warn", "error", "fatal"]
+    }
+  }
+}

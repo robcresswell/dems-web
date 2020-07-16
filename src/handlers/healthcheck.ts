@@ -1,15 +1,6 @@
-import { RequestHandler, RouteSchema } from 'fastify';
+import { Handler } from '../types';
+import { Healthcheck } from '../types/healthcheck';
 
-export const healthcheckSchema: RouteSchema = {
-  response: {
-    204: {
-      description: 'Success',
-      type: 'object',
-    },
-  },
-};
-
-// eslint-disable-next-line @typescript-eslint/require-await
-export const healthcheck: RequestHandler = async function (_req, reply) {
+export const healthcheck: Handler<Healthcheck> = async function (_req, reply) {
   return reply.code(204).send();
 };

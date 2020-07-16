@@ -1,9 +1,12 @@
-import { RouteOptions } from 'fastify';
-import { healthcheck, healthcheckSchema } from './handlers/healthcheck';
+import { healthcheck } from './handlers/healthcheck';
+import * as healthcheckSchema from './schemas/healthcheck.json';
 
-export const routes: RouteOptions[] = [
+const GET = 'GET' as const;
+const HEAD = 'HEAD' as const;
+
+export const routes = [
   {
-    method: ['HEAD', 'GET'],
+    method: [HEAD, GET],
     url: '/healthcheck',
     schema: healthcheckSchema,
     handler: healthcheck,

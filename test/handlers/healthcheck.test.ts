@@ -1,13 +1,11 @@
-import { startTestServer } from '../helpers/test-server';
 import { FastifyInstance } from 'fastify';
-import got from 'got';
+import { getTestServer } from '../helpers/test-server';
 
 describe('/healthcheck', () => {
   let server: FastifyInstance;
-  let host: string;
 
   beforeEach(async () => {
-    ({ server, host } = await startTestServer());
+    ({ server } = await getTestServer());
   });
 
   afterEach(async () => {
@@ -15,13 +13,13 @@ describe('/healthcheck', () => {
   });
 
   it('responds to a GET request', async () => {
-    const res = await got.get(`${host}/healthcheck`);
+    const res = await server.inject('/healthcheck');
 
     expect(res.statusCode).toBe(204);
   });
 
   it('responds to a HEAD request', async () => {
-    const res = await got.head(`${host}/healthcheck`);
+    const res = await server.inject('/healthcheck');
 
     expect(res.statusCode).toBe(204);
   });

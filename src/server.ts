@@ -1,9 +1,10 @@
-import * as Fastify from 'fastify';
+import { fastify, FastifyInstance, FastifyLoggerOptions } from 'fastify';
 import * as fastifySwagger from 'fastify-swagger';
-import { readFileSync } from 'fs';
-import * as path from 'path';
+import { validateAgainstSchema } from './lib/validate-against-schema';
+import { validateResponse } from './middleware/on-route';
 import { routes } from './routes';
-import { Config } from './types';
+import * as configSchema from './schemas/config.json';
+import { Config } from './types/config';
 
 // Declare types for Fastify with config added
 declare module 'fastify' {
@@ -12,43 +13,60 @@ declare module 'fastify' {
   }
 }
 
-export function initServer(config: Readonly<Config>) {
-  const { logger } = config;
-
-  // Grab framework instance, using the injected config
-  const fastify = Fastify({ logger });
-
-  // Add local config object to fastify Reply object. Adding it via a server
-  // instance, rather than its own config instance, makes it easy to create
-  // test servers
-  fastify.decorate('config', config);
-
-  // Read some content from the package.json so we don't need to duplicate it
-  const packageJSONString = readFileSync(
-    path.join(__dirname, '..', 'package.json'),
-    'utf-8',
+export async function initServer(
+  configBeforeValidation: unknown,
+): Promise<FastifyInstance> {
+  const configValidationResult = validateAgainstSchema<Config>(
+    configSchema,
+    configBeforeValidation,
   );
-  const packageJSON = JSON.parse(packageJSONString);
-  const { name, description, version } = packageJSON;
 
-  // Register the fastify-swagger plugin, which generates documentation from
-  // our JSON schema route validation
-  // Docs served at /documentation
-  fastify.register(fastifySwagger, {
+  if ('error' in configValidationResult) {
+    throw new Error(configValidationResult.error.message);
+  }
+
+  const config = configValidationResult.data;
+  const isDev =
+    process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
+
+  /* istanbul ignore next */
+  const prettyPrint = isDev ? { translateTime: 'HH:MM:ss' } : false;
+  /* istanbul ignore next */
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const logLevel = config.LOG_LEVEL ?? (isDev ? 'debug' : 'info');
+
+  const server = fastify({
+    logger: {
+      name: '{{ name }}',
+      base: { name: '{{ name }}' },
+      prettyPrint,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      level: logLevel,
+    } as FastifyLoggerOptions,
+  });
+
+  server.decorate('config', config);
+
+  await server.register(fastifySwagger, {
     exposeRoute: true,
     swagger: {
       info: {
-        title: name,
-        description,
-        version,
+        title: process.env.npm_package_name ?? '',
+        version: process.env.npm_package_version ?? '',
+        description: process.env.npm_package_description,
       },
     },
   });
 
+  /* istanbul ignore next */
+  if (isDev) {
+    server.addHook('onRoute', validateResponse);
+  }
+
   // Register all defined routes
   routes.forEach((route) => {
-    fastify.route(route);
+    server.route(route);
   });
 
-  return fastify;
+  return server;
 }

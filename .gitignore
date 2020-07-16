@@ -10,14 +10,5 @@ dist/
 # Local env vars
 .env
 
-# Local config file
-config.json
-
 # Generated reports, such as test outputs, coverage
 reports/
-
-# Yarn cached stuff
-.yarn/cache
-.yarn/unplugged
-.yarn/build-state.yml
-.pnp.js
