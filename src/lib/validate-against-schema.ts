@@ -1,5 +1,5 @@
-import * as AJV from 'ajv';
-import { Json } from '../types';
+import AJV from 'ajv';
+import type { Json } from '../types';
 
 export type SchemaValidationResult<T> =
   | { error: { message: string } }
@@ -29,7 +29,7 @@ export function validateAgainstSchema<T>(
 
   return {
     error: {
-      message: `${firstError.dataPath || 'Input'} ${errorString}`,
+      message: `${firstError!.dataPath || 'Input'} ${errorString}`,
     },
   };
 }

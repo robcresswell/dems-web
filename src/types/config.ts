@@ -1,5 +1,5 @@
 /* istanbul ignore file */
-/* eslint-disable @typescript-eslint/no-empty-interface */
+/* eslint-disable @typescript-eslint/no-empty-interface,@typescript-eslint/ban-types */
 
 // DO NOT MANUALLY EDIT THIS FILE
 //
@@ -9,5 +9,5 @@
 
 export interface Config {
   HOST: string;
-  LOG_LEVEL?: 'debug' | 'info' | 'warn' | 'error' | 'fatal';
+  LOG_LEVEL: 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 }

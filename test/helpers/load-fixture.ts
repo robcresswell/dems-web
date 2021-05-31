@@ -1,5 +1,5 @@
 import { promises as fsp } from 'fs';
-import * as path from 'path';
+import path from 'path';
 
 export async function loadFixture(name: string): Promise<string> {
   const fixtureDir = path.resolve(__dirname, '..', 'fixtures');

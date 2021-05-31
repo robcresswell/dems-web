@@ -1,23 +1,34 @@
-#!/usr/bin/env -S node -r ts-node/register
+#!/usr/bin/env -S node -r ts-node/register/transpile-only
+/* eslint-disable no-console */
 
+import { promises as fsp, existsSync } from 'fs';
+import path from 'path';
 import { compile } from 'json-schema-to-typescript';
-import { promises as fsp } from 'fs';
-import * as path from 'path';
-import * as globby from 'globby';
+import globby from 'globby';
 
 // Some colour utilities for the output
 export const reset = '\x1b[0m';
 const green = (str: string) => `\x1b[32m✓ ${str}${reset}`;
-const red = (str: string) => `\x1b[31m⨯ ${str}${reset}`;
+const red = (str: string) => `\x1b[31m${str}${reset}`;
+
+type JsonObj = Record<string, Json>;
+
+type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [property: string]: Json }
+  | Json[];
 
 async function loadJSON(path: string) {
   const fileStr = await fsp.readFile(path, { encoding: 'utf-8' });
-  return JSON.parse(fileStr);
+  return JSON.parse(fileStr) as JsonObj;
 }
 
 function generateBannerComment(schemaFilePath: string) {
   const bannerComment = `/* istanbul ignore file */
-  /* eslint-disable @typescript-eslint/no-empty-interface */
+  /* eslint-disable @typescript-eslint/no-empty-interface,@typescript-eslint/ban-types */
 
   // DO NOT MANUALLY EDIT THIS FILE
   //
@@ -28,25 +39,18 @@ function generateBannerComment(schemaFilePath: string) {
   return bannerComment;
 }
 
-// Fastify route schemas have several fields that aren't useful to encode into
-// types, such as the summary, or tags. Rather than generate noise in the type
-// defs, exclude these fields during type generation
-const excludeFields = [
-  'summary',
-  'tags',
-  'response',
-  'type',
-  'required',
-  'additionalProperties',
-];
+async function writeFile(path: string, contents: string) {
+  await fsp.writeFile(path, contents, { encoding: 'utf-8' });
+}
 
-/**
- * Takes an object, and removes the supplied field names from it
- */
-function omit(obj: { [key: string]: any }, fields: string[]) {
-  return Object.fromEntries(
-    Object.entries(obj).filter(([key]) => !fields.includes(key)),
-  );
+async function isFileCurrent(path: string, newContents: string): Promise<boolean> {
+  if (!existsSync(path)) {
+    return false;
+  }
+
+  const existingContents = await fsp.readFile(path, { encoding: 'utf-8' });
+
+  return newContents === existingContents;
 }
 
 /**
@@ -80,22 +84,16 @@ async function generateTypes() {
         .join('\n'),
   );
 
-  const generatedFiles = await Promise.all(
+  const filesToWrite: { contents: string; filePath: string }[] = [];
+
+  await Promise.all(
     schemaFilePaths.map(async (schemaFilePath) => {
-      let schema = await loadJSON(schemaFilePath);
-
-      // Fastify route schemas are not valid JSON schema, so we work around this
-      // by coercing any JSON with a 'response' field into a usable shape.
-      if (schema.response) {
-        const reducedSchema = omit(schema, excludeFields);
-        schema = {
-          type: 'object' as const,
-          properties: reducedSchema,
-          required: Object.keys(reducedSchema),
-          additionalProperties: false,
-        };
-      }
-
+      const typeDir = path.join(
+        rootDir,
+        'src',
+        'types',
+        path.relative(schemaDir, path.dirname(schemaFilePath)),
+      );
       const typeFileName = path.basename(
         schemaFilePath,
         path.extname(schemaFilePath),
@@ -103,65 +101,106 @@ async function generateTypes() {
       const bannerComment = generateBannerComment(
         path.relative(rootDir, schemaFilePath),
       );
-      const style = await loadJSON(
-        path.join(__dirname, '..', '.prettierrc.json'),
+      const style: Json = await loadJSON(
+        path.join(rootDir, '.prettierrc.json'),
       );
-      const typedef = await compile(schema, typeFileName, {
+      const compileOpts = {
         bannerComment,
         style,
         cwd: schemaDir,
         enableConstEnums: false,
-      });
+      };
 
-      const typeDefPath = path.join(
-        rootDir,
-        'src',
-        'types',
-        path.relative(schemaDir, path.dirname(schemaFilePath)),
-        `${typeFileName}.ts`,
-      );
+      const schema = await loadJSON(schemaFilePath);
 
-      let isCurrent = false;
+      // Fastify route schemas are not valid JSON schema, so we work around this
+      // by coercing any JSON with a 'response' field into a usable shape.
+      if (schema.response) {
+        const requestSchema = {
+          type: 'object' as const,
+          properties: {
+            body: schema.body ?? {},
+            headers: schema.headers ?? {},
+            params: schema.params ?? {},
+            query: schema.query ?? {},
+            reply: { oneOf: Object.values(schema.response) } ?? {},
+          },
+          required: ['body', 'headers', 'params', 'query', 'reply'],
+          additionalProperties: false,
+        };
 
-      if (checkOnly) {
-        const existingTypes = await fsp.readFile(typeDefPath, {
-          encoding: 'utf-8',
+        const requestTypeDef = await compile(
+          requestSchema,
+          typeFileName,
+          compileOpts,
+        );
+        const requestTypeDefPath = path.join(typeDir, `${typeFileName}.ts`);
+
+        filesToWrite.push({
+          filePath: requestTypeDefPath,
+          contents: requestTypeDef,
         });
-        isCurrent = existingTypes === typedef;
       } else {
-        await fsp.writeFile(typeDefPath, typedef, { encoding: 'utf-8' });
-        isCurrent = true;
-      }
+        const typeDef = await compile(schema, typeFileName, compileOpts);
+        const typeDefPath = path.join(typeDir, `${typeFileName}.ts`);
 
-      return { typeDefPath, isCurrent };
+        filesToWrite.push({ contents: typeDef, filePath: typeDefPath });
+      }
     }),
   );
 
-  if (checkOnly) {
-    let hasOutdatedTypes = false;
-    console.info(`\nTypes checked:\n`);
-    generatedFiles.forEach(({ typeDefPath, isCurrent }) => {
-      if (isCurrent) {
-        console.info(`  ${green(path.relative(rootDir, typeDefPath))}`);
+  const currentFiles: string[] = [];
+  const newFiles: string[] = [];
+  const outdatedFiles: string[] = [];
+
+  await Promise.all(
+    filesToWrite.map(async ({ filePath, contents }) => {
+      if (await isFileCurrent(filePath, contents)) {
+        currentFiles.push(filePath);
       } else {
-        console.error(`  ${red(path.relative(rootDir, typeDefPath))}`);
-        hasOutdatedTypes = true;
+        if (checkOnly) {
+          outdatedFiles.push(filePath);
+        } else {
+          const dir = path.dirname(filePath);
+          if (!existsSync(dir)) {
+            await fsp.mkdir(dir);
+          }
+
+          await writeFile(filePath, contents);
+          newFiles.push(filePath);
+        }
       }
+    }),
+  );
+
+  if (currentFiles.length === filesToWrite.length) {
+    console.log(`\n${green('All schema files up to date!')}\n`);
+  }
+
+  if (newFiles.length) {
+    console.info('\nThe following files were created / updated\n');
+
+    newFiles.forEach((filePath) => {
+      console.info(`  ${green(path.relative(rootDir, filePath))}`);
     });
-    if (hasOutdatedTypes) {
-      console.error(
-        `\n${red(
-          'Types are outdated, please run `./scripts/generate-types.ts`',
-        )}\n`,
-      );
-    }
-    process.exit(Number(hasOutdatedTypes));
-  } else {
-    console.info(`\nTypes generated:\n`);
-    generatedFiles.forEach(({ typeDefPath }) => {
-      console.info(`  ${path.relative(rootDir, typeDefPath)}`);
+
+    console.log();
+  }
+
+  if (outdatedFiles.length) {
+    console.error(
+      red(
+        '\n⨯ The following type defs are outdated. Please run `./scripts/generate-types.ts`\n',
+      ),
+    );
+
+    outdatedFiles.forEach((filePath) => {
+      console.error(`  ${path.relative(rootDir, filePath)}`);
     });
-    console.info(`\n${green('Types generated successfully!\n')}`);
+
+    console.log();
+
+    process.exit(1);
   }
 }
 

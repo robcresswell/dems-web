@@ -1,7 +1,7 @@
-import { FastifyInstance } from 'fastify';
-import * as getPort from 'get-port';
+import type { FastifyInstance } from 'fastify';
+import getPort from 'get-port';
 import { initServer } from '../../src/server';
-import { Config } from '../../src/types/config';
+import type { Config } from '../../src/types/config';
 import { getTestConfig } from './test-config';
 
 /**

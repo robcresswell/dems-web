@@ -1,4 +1,4 @@
-import {
+import type {
   RawReplyDefaultExpression,
   RawRequestDefaultExpression,
   RawServerBase,
@@ -8,6 +8,7 @@ import {
   ContextConfigDefault,
   RequestHeadersDefault,
 } from 'fastify';
+import type { ReplyDefault } from 'fastify/types/utils';
 
 /**
  * A generic "json object" type. Note the top level "Json" type is stricter than
@@ -29,26 +30,27 @@ type JsonVal =
 //   declare them on every handler, declare them once here, and only expose
 //   the Request type parameter as part of the Handler interface.
 // - The fastify types expect capitals, but the schema defintions etc use
-//    lowercase, i.e. "Headers" vs "headers". There might be a nicer way of
-//    doing this?
+//   lowercase, i.e. "Headers" vs "headers". There might be a nicer way of
+//   doing this?
 type BaseRequest = {
-  querystring?: RequestParamsDefault;
+  query?: RequestParamsDefault;
   params?: RequestParamsDefault;
   headers?: RequestHeadersDefault;
   body?: RequestBodyDefault;
+  reply?: ReplyDefault;
 };
 
-export type Handler<
-  Request extends BaseRequest = BaseRequest
-> = RouteHandlerMethod<
-  RawServerBase,
-  RawRequestDefaultExpression,
-  RawReplyDefaultExpression,
-  {
-    Body: Request['body'];
-    Headers: Request['headers'];
-    Params: Request['params'];
-    Querystring: Request['querystring'];
-  },
-  ContextConfigDefault
->;
+export type Handler<Request extends BaseRequest = BaseRequest> =
+  RouteHandlerMethod<
+    RawServerBase,
+    RawRequestDefaultExpression,
+    RawReplyDefaultExpression,
+    {
+      Body: Request['body'];
+      Headers: Request['headers'];
+      Params: Request['params'];
+      Querystring: Request['query'];
+      Reply: Request['reply'];
+    },
+    ContextConfigDefault
+  >;

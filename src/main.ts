@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 import { promises as fsp } from 'fs';
 import { resolve } from 'path';
-import * as dotenv from 'dotenv';
+import dotenv from 'dotenv';
 import { initServer } from './server';
 
 async function main() {
@@ -15,7 +15,7 @@ async function main() {
   } catch (error) {
     // If we're in dev mode, silently fall back to some minimal defaults to
     // make it easier to get started, otherwise, re-throw the error
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env['NODE_ENV'] === 'development') {
       config = {
         HOST: 'http://localhost',
         LOG_LEVEL: 'debug',

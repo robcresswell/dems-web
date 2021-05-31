@@ -1,10 +1,9 @@
 import { fastify, FastifyInstance, FastifyLoggerOptions } from 'fastify';
-import * as fastifySwagger from 'fastify-swagger';
+import fastifySwagger from 'fastify-swagger';
 import { validateAgainstSchema } from './lib/validate-against-schema';
-import { validateResponse } from './middleware/on-route';
 import { routes } from './routes';
 import * as configSchema from './schemas/config.json';
-import { Config } from './types/config';
+import type { Config } from './types/config';
 
 // Declare types for Fastify with config added
 declare module 'fastify' {
@@ -27,7 +26,8 @@ export async function initServer(
 
   const config = configValidationResult.data;
   const isDev =
-    process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
+    process.env['NODE_ENV'] === 'development' ||
+    process.env['NODE_ENV'] === 'test';
 
   /* istanbul ignore next */
   const prettyPrint = isDev ? { translateTime: 'HH:MM:ss' } : false;
@@ -51,17 +51,12 @@ export async function initServer(
     exposeRoute: true,
     swagger: {
       info: {
-        title: process.env.npm_package_name ?? '',
-        version: process.env.npm_package_version ?? '',
-        description: process.env.npm_package_description,
+        title: process.env['npm_package_name'] ?? '',
+        version: process.env['npm_package_version'] ?? '',
+        description: process.env['npm_package_description'],
       },
     },
   });
-
-  /* istanbul ignore next */
-  if (isDev) {
-    server.addHook('onRoute', validateResponse);
-  }
 
   // Register all defined routes
   routes.forEach((route) => {

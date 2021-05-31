@@ -1,4 +1,4 @@
-import { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from 'fastify';
 import { startTestServer } from './helpers/test-server';
 
 describe('server initialisation', () => {
