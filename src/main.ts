@@ -1,7 +1,6 @@
 /* istanbul ignore file */
 import { promises as fsp } from 'fs';
 import { resolve } from 'path';
-import dotenv from 'dotenv';
 import { initServer } from './server';
 
 async function main() {
@@ -26,11 +25,6 @@ async function main() {
   }
 
   const server = await initServer(config);
-
-  // Mutates `process.env` with values in local `.env` file. This means we can
-  // avoid storing secrets in global environment variables, and instead keep
-  // them scoped to this project
-  dotenv.config();
 
   try {
     await server.listen(3000);

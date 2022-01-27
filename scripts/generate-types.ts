@@ -1,5 +1,4 @@
 #!/usr/bin/env -S node -r ts-node/register/transpile-only
-/* eslint-disable no-console */
 
 import { promises as fsp, existsSync } from 'fs';
 import path from 'path';
@@ -43,14 +42,14 @@ async function writeFile(path: string, contents: string) {
   await fsp.writeFile(path, contents, { encoding: 'utf-8' });
 }
 
-async function isFileCurrent(path: string, newContents: string): Promise<boolean> {
+async function isFileCurrent(path: string, contents: string): Promise<boolean> {
   if (!existsSync(path)) {
     return false;
   }
 
   const existingContents = await fsp.readFile(path, { encoding: 'utf-8' });
 
-  return newContents === existingContents;
+  return contents === existingContents;
 }
 
 /**
@@ -115,15 +114,15 @@ async function generateTypes() {
 
       // Fastify route schemas are not valid JSON schema, so we work around this
       // by coercing any JSON with a 'response' field into a usable shape.
-      if (schema.response) {
-        const requestSchema = {
+      if (schema['response']) {
+        const requestSchema: any = {
           type: 'object' as const,
           properties: {
-            body: schema.body ?? {},
-            headers: schema.headers ?? {},
-            params: schema.params ?? {},
-            query: schema.query ?? {},
-            reply: { oneOf: Object.values(schema.response) } ?? {},
+            body: schema['body'] ?? {},
+            headers: schema['headers'] ?? {},
+            params: schema['params'] ?? {},
+            query: schema['query'] ?? {},
+            reply: { oneOf: Object.values(schema['response']) } ?? {},
           },
           required: ['body', 'headers', 'params', 'query', 'reply'],
           additionalProperties: false,

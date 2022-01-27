@@ -29,7 +29,7 @@ export function validateAgainstSchema<T>(
 
   return {
     error: {
-      message: `${firstError!.dataPath || 'Input'} ${errorString}`,
+      message: `${firstError?.dataPath || 'Input'} ${errorString}`,
     },
   };
 }

@@ -10,7 +10,6 @@
     "jest/no-export": "error",
     "jest/no-mocks-import": "error",
     "jest/no-test-return-statement": "error",
-    "jest/no-try-expect": "error",
     "jest/require-top-level-describe": "error",
     "jest/no-commented-out-tests": "error",
     "jest/no-jasmine-globals": "error",
