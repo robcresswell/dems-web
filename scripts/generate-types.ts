@@ -115,6 +115,7 @@ async function generateTypes() {
       // Fastify route schemas are not valid JSON schema, so we work around this
       // by coercing any JSON with a 'response' field into a usable shape.
       if (schema['response']) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const requestSchema: any = {
           type: 'object' as const,
           properties: {
@@ -129,6 +130,7 @@ async function generateTypes() {
         };
 
         const requestTypeDef = await compile(
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           requestSchema,
           typeFileName,
           compileOpts,
