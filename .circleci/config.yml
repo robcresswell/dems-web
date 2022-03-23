@@ -2,7 +2,7 @@ version: 2.1
 
 defaults: &defaults
   docker:
-    - image: node:12-buster
+    - image: cimg/node:18.5
   working_directory: ~/{{ name }}
 
 jobs:
@@ -17,17 +17,11 @@ jobs:
     steps:
       - checkout
       - run: npm ci
-      - run: npm run test -- --runInBand --coverage
+      - run: npm run test -- --coverage
       - store_test_results:
           path: reports/jest/
       - store_artifacts:
           path: reports/
-  check_generated_types:
-    <<: *defaults
-    steps:
-      - checkout
-      - run: npm ci
-      - run: npm run test:generated-types
 
 workflows:
   version: 2
@@ -38,7 +32,4 @@ workflows:
           context: nodejs-install
       - test:
           name: Test
-          context: nodejs-install
-      - check_generated_types:
-          name: Check Generated Types
           context: nodejs-install

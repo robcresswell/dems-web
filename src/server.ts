@@ -1,9 +1,8 @@
-import { fastify, FastifyInstance, FastifyLoggerOptions } from 'fastify';
-import fastifySwagger from 'fastify-swagger';
-import { validateAgainstSchema } from './lib/validate-against-schema';
+import { fastify, FastifyInstance } from 'fastify';
+import fastifySwagger from '@fastify/swagger';
+import type { Logger } from 'pino';
 import { routes } from './routes';
-import * as configSchema from './schemas/config.json';
-import type { Config } from './types/config';
+import type { Config } from './validators/config';
 
 // Declare types for Fastify with config added
 declare module 'fastify' {
@@ -13,37 +12,10 @@ declare module 'fastify' {
 }
 
 export async function initServer(
-  configBeforeValidation: unknown,
+  config: Config,
+  logger: Logger,
 ): Promise<FastifyInstance> {
-  const configValidationResult = validateAgainstSchema<Config>(
-    configSchema,
-    configBeforeValidation,
-  );
-
-  if ('error' in configValidationResult) {
-    throw new Error(configValidationResult.error.message);
-  }
-
-  const config = configValidationResult.data;
-  const isDev =
-    process.env['NODE_ENV'] === 'development' ||
-    process.env['NODE_ENV'] === 'test';
-
-  /* istanbul ignore next */
-  const prettyPrint = isDev ? { translateTime: 'HH:MM:ss' } : false;
-  /* istanbul ignore next */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const logLevel = config.LOG_LEVEL ?? (isDev ? 'debug' : 'info');
-
-  const server = fastify({
-    logger: {
-      name: '{{ name }}',
-      base: { name: '{{ name }}' },
-      prettyPrint,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      level: logLevel,
-    } as FastifyLoggerOptions,
-  });
+  const server = fastify({ logger });
 
   server.decorate('config', config);
 
